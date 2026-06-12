@@ -2,10 +2,9 @@
 
 import DateTimeRangeComponent from "@/components/ui/datetime/DateTimeRange";
 import { DropdownMenu } from "@/components/ui/dropDownMenu";
-import NursingEfficiencyViewSwitcher from "@/components/nursing-efficiency/NursingEfficiencyViewSwitcher";
 import { getNurseDropdownOptions, getPracticeDropdownOptions } from "@/lib/nursing-efficiency/dev/nursing-efficiency-mock";
 import { ENROLLMENT_SECTION_LABEL } from "@/lib/enrollment/styles";
-import type { NursingEfficiencyFilters, NursingEfficiencyViewMode } from "@/lib/nursing-efficiency/types";
+import type { NursingEfficiencyFilters } from "@/lib/nursing-efficiency/types";
 import type { DateRange } from "react-day-picker";
 import type { DateRangePreset } from "@/types/report";
 
@@ -14,22 +13,16 @@ const FILTER_TRIGGER_CLASS =
 
 type Props = {
   filters: NursingEfficiencyFilters;
-  viewMode: NursingEfficiencyViewMode;
-  isAllNurses: boolean;
   onDateRangeChange: (range: DateRange, preset: DateRangePreset) => void;
   onNurseChange: (nurseId: string) => void;
   onPracticeChange: (practiceId: string) => void;
-  onViewModeChange: (mode: NursingEfficiencyViewMode) => void;
 };
 
 export default function NursingEfficiencyFilters({
   filters,
-  viewMode,
-  isAllNurses,
   onDateRangeChange,
   onNurseChange,
   onPracticeChange,
-  onViewModeChange,
 }: Props) {
   const nurseOptions = getNurseDropdownOptions();
   const practiceOptions = getPracticeDropdownOptions();
@@ -66,12 +59,6 @@ export default function NursingEfficiencyFilters({
           triggerVariant="select"
         />
       </div>
-
-      <NursingEfficiencyViewSwitcher
-        viewMode={viewMode}
-        isAllNurses={isAllNurses}
-        onViewModeChange={onViewModeChange}
-      />
     </div>
   );
 }

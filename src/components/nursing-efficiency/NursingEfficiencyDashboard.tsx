@@ -2,8 +2,6 @@
 
 import Card from "@/components/ui/card/Card";
 import EfficiencySummaryTable from "@/components/nursing-efficiency/EfficiencySummaryTable";
-import NurseCompareMatrixTable from "@/components/nursing-efficiency/NurseCompareMatrixTable";
-import NurseEfficiencyChart from "@/components/nursing-efficiency/NurseEfficiencyChart";
 import NursingEfficiencyFilters from "@/components/nursing-efficiency/NursingEfficiencyFilters";
 import { ENROLLMENT_CONTENT_SHELL, ENROLLMENT_PAGE_BG, ENROLLMENT_PAGE_MIN_HEIGHT } from "@/lib/enrollment/styles";
 import { useNursingEfficiency } from "@/lib/nursing-efficiency/hooks/useNursingEfficiency";
@@ -12,17 +10,12 @@ import { cn } from "@/lib/utils/style";
 export default function NursingEfficiencyDashboard() {
   const {
     filters,
-    viewMode,
     rows,
     totals,
-    compareRows,
-    chartSeries,
-    isAllNurses,
     isWeekPreset,
     setDateRange,
     setNurseId,
     setPracticeId,
-    setViewMode,
   } = useNursingEfficiency();
 
   return (
@@ -39,19 +32,14 @@ export default function NursingEfficiencyDashboard() {
         <div className="shrink-0">
           <NursingEfficiencyFilters
             filters={filters}
-            viewMode={viewMode}
-            isAllNurses={isAllNurses}
             onDateRangeChange={setDateRange}
             onNurseChange={setNurseId}
             onPracticeChange={setPracticeId}
-            onViewModeChange={setViewMode}
           />
         </div>
 
         <div className="shrink-0">
-          {viewMode === "summary" && <EfficiencySummaryTable rows={rows} totals={totals} periodLabel={isWeekPreset ? "Day" : "Week"} />}
-          {viewMode === "compare" && <NurseCompareMatrixTable rows={compareRows} />}
-          {viewMode === "chart" && <NurseEfficiencyChart series={chartSeries} />}
+          <EfficiencySummaryTable rows={rows} totals={totals} periodLabel={isWeekPreset ? "Day" : "Week"} />
         </div>
       </Card>
     </div>
