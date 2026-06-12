@@ -21,9 +21,9 @@ type Props = {
   className?: string;
 };
 
-const HEADER_CLASS = `${ENROLLMENT_SECTION_LABEL} px-3 py-2.5 text-left border border-slate-200 bg-[#E8F7FA]/80`;
-const CELL_CLASS = "px-3 py-2.5 text-sm text-[#1B3A4F] border border-slate-200";
-const TOTAL_CELL_CLASS = "px-3 py-2.5 text-sm font-semibold text-[#1B3A4F] border border-slate-200 bg-[#F4F7FA]/60";
+const HEADER_CLASS = `${ENROLLMENT_SECTION_LABEL} px-5 py-2.5 text-left border border-slate-200 bg-[#E8F7FA]/80`;
+const CELL_CLASS = "px-5 py-2.5 text-sm text-[#1B3A4F] border border-slate-200 whitespace-nowrap";
+const TOTAL_CELL_CLASS = "px-5 py-2.5 text-sm font-semibold text-[#1B3A4F] border border-slate-200 bg-[#F4F7FA]/60";
 
 function ColumnHeaderWithTooltip({ label, tooltip }: { label: string; tooltip: string }) {
   return (
@@ -51,7 +51,8 @@ function ColumnHeaderWithTooltip({ label, tooltip }: { label: string; tooltip: s
 
 export default function EfficiencySummaryTable({ rows, totals, periodLabel = "Week", className }: Props) {
   return (
-    <div className={cn(ENROLLMENT_CONTENT_SHELL, "w-full overflow-x-auto", className)}>
+    <div className={cn("rounded-[10px] overflow-hidden", className)}>
+      <div className="overflow-x-auto">
       <table className="w-full min-w-[720px] table-fixed border-collapse">
         <colgroup>
           <col className="w-[14%]" />
@@ -124,6 +125,7 @@ export default function EfficiencySummaryTable({ rows, totals, periodLabel = "We
           </tfoot>
         )}
       </table>
+      </div>
     </div>
   );
 }

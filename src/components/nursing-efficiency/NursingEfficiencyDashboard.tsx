@@ -24,7 +24,7 @@ export default function NursingEfficiencyDashboard() {
         <div className="flex shrink-0 flex-col gap-2">
           <h1 className="text-2xl font-semibold text-[#1B3A4F] md:text-3xl">Nursing Efficiency</h1>
           <p className="text-sm text-[#5F8899]">
-            Efficiency compares payroll hours against an activity-based estimate from DialPad logs.
+            Efficiency shows how much of each nurse's paid time is accounted for by documented activity (calls and SMS).
           </p>
           <p className="text-xs text-[#5F8899]">Paid hours · Gusto (mock)</p>
         </div>
