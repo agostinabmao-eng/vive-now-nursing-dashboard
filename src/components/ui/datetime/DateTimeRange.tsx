@@ -93,8 +93,6 @@ export default function DateTimeRangeComponent({ selected, onSelect }: Props) {
               numberOfMonths={2}
               styles={{
                 caption: { color: "#1B3A4F" },
-                day_selected: { backgroundColor: "#3EB1C8" },
-                day_range_middle: { backgroundColor: "#E8F7FA" },
               }}
             />
           </div>
