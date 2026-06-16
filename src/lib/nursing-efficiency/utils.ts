@@ -97,6 +97,18 @@ export function formatMixedDuration(totalMinutes: number): string {
   return `${hours}h ${String(minutes).padStart(2, "0")}m`;
 }
 
+const CPT_REVENUE_PER_CALL = 25;
+const NURSE_COST_PER_HOUR = 25;
+
+export function computeEarnings(callsCompletedCpt: number, actualHours: number): number {
+  return callsCompletedCpt * CPT_REVENUE_PER_CALL - actualHours * NURSE_COST_PER_HOUR;
+}
+
+export function formatEarnings(earnings: number): string {
+  const abs = Math.abs(Math.round(earnings));
+  return earnings >= 0 ? `+$${abs}` : `-$${abs}`;
+}
+
 export function buildEfficiencyRow(
   week: WeekBucket,
   metrics: WeeklyDialPadMetrics,
@@ -121,6 +133,7 @@ export function buildEfficiencyRow(
     actualMinutes,
     expectedMinutes,
     efficiencyPercent: computeEfficiencyPercent(expectedMinutes, actualMinutes),
+    earnings: computeEarnings(metrics.callsCompletedCpt, actualHours),
   };
 }
 
@@ -133,6 +146,7 @@ export function buildEfficiencyTotals(rows: WeeklyEfficiencyRow[]): EfficiencyTo
       smsSent: acc.smsSent + row.smsSent,
       actualMinutes: acc.actualMinutes + row.actualMinutes,
       expectedMinutes: acc.expectedMinutes + row.expectedMinutes,
+      earnings: acc.earnings + row.earnings,
     }),
     {
       actualHours: 0,
@@ -141,6 +155,7 @@ export function buildEfficiencyTotals(rows: WeeklyEfficiencyRow[]): EfficiencyTo
       smsSent: 0,
       actualMinutes: 0,
       expectedMinutes: 0,
+      earnings: 0,
     }
   );
 

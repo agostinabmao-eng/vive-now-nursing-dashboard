@@ -11,7 +11,7 @@ import {
   PAID_TIME_TOOLTIP,
 } from "@/lib/nursing-efficiency/copy";
 import type { EfficiencyTotals, WeeklyEfficiencyRow } from "@/lib/nursing-efficiency/types";
-import { formatMixedDuration } from "@/lib/nursing-efficiency/utils";
+import { formatMixedDuration, formatEarnings } from "@/lib/nursing-efficiency/utils";
 import { cn } from "@/lib/utils/style";
 
 type Props = {
@@ -24,6 +24,14 @@ type Props = {
 const HEADER_CLASS = `${ENROLLMENT_SECTION_LABEL} px-5 py-2.5 text-left border border-slate-200 bg-[#E8F7FA]/80`;
 const CELL_CLASS = "px-5 py-2.5 text-sm text-[#1B3A4F] border border-slate-200 whitespace-nowrap";
 const TOTAL_CELL_CLASS = "px-5 py-2.5 text-sm font-semibold text-[#1B3A4F] border border-slate-200 bg-[#F4F7FA]/60";
+
+const EARNINGS_TOOLTIP = "Estimated net earnings: (Calls Completed × $25 revenue) − (Paid Hours × $25 cost).";
+
+function earningsColor(earnings: number): string {
+  if (earnings > 0) return "text-vivenowgreen";
+  if (earnings < 0) return "text-vivenowred";
+  return "";
+}
 
 function ColumnHeaderWithTooltip({ label, tooltip }: { label: string; tooltip: string }) {
   return (
@@ -53,15 +61,16 @@ export default function EfficiencySummaryTable({ rows, totals, periodLabel = "We
   return (
     <div className={cn("rounded-[10px] overflow-hidden", className)}>
       <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px] table-fixed border-collapse">
+      <table className="w-full min-w-[820px] table-fixed border-collapse">
         <colgroup>
-          <col className="w-[14%]" />
           <col className="w-[12%]" />
-          <col className="w-[14%]" />
           <col className="w-[11%]" />
-          <col className="w-[18%]" />
+          <col className="w-[13%]" />
+          <col className="w-[10%]" />
           <col className="w-[16%]" />
-          <col className="w-[15%]" />
+          <col className="w-[14%]" />
+          <col className="w-[13%]" />
+          <col className="w-[11%]" />
         </colgroup>
         <thead>
           <tr>
@@ -84,12 +93,15 @@ export default function EfficiencySummaryTable({ rows, totals, periodLabel = "We
             <th scope="col" className={HEADER_CLASS}>
               <ColumnHeaderWithTooltip label="Efficiency" tooltip={EFFICIENCY_TOOLTIP} />
             </th>
+            <th scope="col" className={HEADER_CLASS}>
+              <ColumnHeaderWithTooltip label="Earnings" tooltip={EARNINGS_TOOLTIP} />
+            </th>
           </tr>
         </thead>
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={7} className={`${CELL_CLASS} py-16 text-center text-[#5F8899]`}>
+              <td colSpan={8} className={`${CELL_CLASS} py-16 text-center text-[#5F8899]`}>
                 Select a date range to view weekly efficiency data.
               </td>
             </tr>
@@ -104,6 +116,9 @@ export default function EfficiencySummaryTable({ rows, totals, periodLabel = "We
                 <td className={CELL_CLASS}>{formatMixedDuration(row.actualMinutes)}</td>
                 <td className={cn(CELL_CLASS, "text-center")}>
                   <EfficiencyBadge percent={row.efficiencyPercent} />
+                </td>
+                <td className={cn(CELL_CLASS, "font-medium", earningsColor(row.earnings))}>
+                  {formatEarnings(row.earnings)}
                 </td>
               </tr>
             ))
@@ -120,6 +135,9 @@ export default function EfficiencySummaryTable({ rows, totals, periodLabel = "We
               <td className={TOTAL_CELL_CLASS}>{formatMixedDuration(totals.actualMinutes)}</td>
               <td className={cn(TOTAL_CELL_CLASS, "text-center")}>
                 <EfficiencyBadge percent={totals.efficiencyPercent} />
+              </td>
+              <td className={cn(TOTAL_CELL_CLASS, earningsColor(totals.earnings))}>
+                {formatEarnings(totals.earnings)}
               </td>
             </tr>
           </tfoot>

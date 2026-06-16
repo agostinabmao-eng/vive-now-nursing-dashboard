@@ -35,6 +35,7 @@ export type WeeklyEfficiencyRow = {
   actualMinutes: number;
   expectedMinutes: number;
   efficiencyPercent: number;
+  earnings: number;
 };
 
 export type EfficiencyTotals = {
@@ -45,6 +46,7 @@ export type EfficiencyTotals = {
   actualMinutes: number;
   expectedMinutes: number;
   efficiencyPercent: number;
+  earnings: number;
 };
 
 export type EfficiencyTier = "high" | "medium" | "low" | "none";
