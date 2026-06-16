@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Card from "@/components/ui/card/Card";
 import EfficiencySummaryTable from "@/components/nursing-efficiency/EfficiencySummaryTable";
 import NursingEfficiencyFilters from "@/components/nursing-efficiency/NursingEfficiencyFilters";
@@ -7,15 +8,18 @@ import NurseDataEntryCard from "@/components/nursing-efficiency/NurseDataEntryCa
 import { ENROLLMENT_PAGE_BG, ENROLLMENT_PAGE_MIN_HEIGHT } from "@/lib/enrollment/styles";
 import { useNursingEfficiency } from "@/lib/nursing-efficiency/hooks/useNursingEfficiency";
 import { useDailyEntries } from "@/lib/nursing-efficiency/hooks/useDailyEntries";
+import type { DashboardViewMode } from "@/components/nursing-efficiency/NursingEfficiencyFilters";
 import { cn } from "@/lib/utils/style";
 
 export default function NursingEfficiencyDashboard() {
+  const [viewMode, setViewMode] = useState<DashboardViewMode>("nurse");
   const { entries, saveEntry, getEntry } = useDailyEntries();
 
   const {
     filters,
     rows,
     totals,
+    weeks,
     isWeekPreset,
     setDateRange,
     setNurseId,
@@ -39,16 +43,29 @@ export default function NursingEfficiencyDashboard() {
             onDateRangeChange={setDateRange}
             onNurseChange={setNurseId}
             onPracticeChange={setPracticeId}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         </div>
 
         <div className="shrink-0">
-          <EfficiencySummaryTable rows={rows} totals={totals} periodLabel={isWeekPreset ? "Day" : "Week"} />
+          <EfficiencySummaryTable
+            rows={rows}
+            totals={totals}
+            periodLabel={isWeekPreset ? "Day" : "Week"}
+            isAdmin={viewMode === "admin"}
+            weeks={weeks}
+            nurseId={filters.nurseId}
+            entries={entries}
+            onSaveEntry={saveEntry}
+          />
         </div>
 
-        <div className="shrink-0">
-          <NurseDataEntryCard onSave={saveEntry} getEntry={getEntry} />
-        </div>
+        {viewMode === "nurse" && (
+          <div className="shrink-0">
+            <NurseDataEntryCard onSave={saveEntry} getEntry={getEntry} />
+          </div>
+        )}
       </Card>
     </div>
   );
