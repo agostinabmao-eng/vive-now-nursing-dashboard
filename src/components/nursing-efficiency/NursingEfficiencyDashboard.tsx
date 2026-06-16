@@ -34,7 +34,7 @@ export default function NursingEfficiencyDashboard() {
           <p className="text-sm text-[#5F8899]">
             Efficiency shows how much of each nurse's paid time is accounted for by documented activity (calls and SMS).
           </p>
-          <p className="text-xs text-[#5F8899]">Paid hours · Gusto (mock)</p>
+
         </div>
 
         <div className="shrink-0">

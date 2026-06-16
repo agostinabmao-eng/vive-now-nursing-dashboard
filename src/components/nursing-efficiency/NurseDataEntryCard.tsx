@@ -144,7 +144,7 @@ export default function NurseDataEntryCard({ onSave, getEntry }: Props) {
           onValueChange={(val) => setDate(String(val))}
         />
         {isEditing && (
-          <span className="mt-1 inline-block rounded-full bg-[#E8F7FA] px-2 py-0.5 text-xs text-[#1B7A92]">
+          <span className="ml-2 inline-block rounded-full bg-[#E8F7FA] px-2 py-0.5 text-xs text-[#1B7A92]">
             Editing
           </span>
         )}

@@ -83,12 +83,20 @@ function aggregateByWeek(records: RawMetricRecord[]): WeeklyDialPadMetrics[] {
   return Array.from(byWeek.values());
 }
 
+// Varied patterns so the demo shows high (green), medium (yellow), and low (red) efficiency
+// plus a mix of positive and negative earnings
+const FALLBACK_PATTERNS = [
+  { callsMade: 15, callsCompletedCpt: 32, smsSent: 20 }, // ~82% eff, +$300 earnings
+  { callsMade: 40, callsCompletedCpt: 22, smsSent: 50 }, // ~58% eff, -$200 earnings
+  { callsMade: 25, callsCompletedCpt: 35, smsSent: 30 }, // ~79% eff, +$250 earnings
+  { callsMade: 15, callsCompletedCpt:  8, smsSent: 20 }, // ~19% eff, -$675 earnings
+  { callsMade: 20, callsCompletedCpt: 25, smsSent: 30 }, // ~67% eff, +$75 earnings
+];
+
 function generateFallbackMetrics(weekKeys: string[]): WeeklyDialPadMetrics[] {
   return weekKeys.map((weekKey, index) => ({
     weekKey,
-    callsMade: 12 + (index % 4) * 3,
-    callsCompletedCpt: 4 + (index % 3),
-    smsSent: 14 + (index % 5) * 2,
+    ...FALLBACK_PATTERNS[index % FALLBACK_PATTERNS.length]!,
   }));
 }
 
@@ -96,19 +104,22 @@ export function getMockDialPadMetrics(query: MockDialPadQuery, weekKeys: string[
   const filtered = filterRecords(query);
   const aggregated = aggregateByWeek(filtered);
 
-  return weekKeys.map((weekKey) => {
+  return weekKeys.map((weekKey, index) => {
     const match = aggregated.find((item) => item.weekKey === weekKey);
     if (match) return match;
 
-    const fallback = generateFallbackMetrics([weekKey])[0];
-    return fallback!;
+    return {
+      weekKey,
+      ...FALLBACK_PATTERNS[index % FALLBACK_PATTERNS.length]!,
+    };
   });
 }
 
+// Hours aligned to FALLBACK_PATTERNS so earnings alternate positive/negative visibly
 const DEFAULT_HOURS_BY_NURSE: Record<string, number[]> = {
-  "nurse-diane": [32, 36, 34, 38],
-  "nurse-mel": [28, 30, 29, 31],
-  "nurse-samantha": [40, 42, 39, 41],
+  "nurse-diane":    [20, 30, 25, 35, 22],
+  "nurse-mel":      [22, 28, 24, 32, 20],
+  "nurse-samantha": [18, 32, 26, 30, 24],
 };
 
 export function getMockGustoPaidHours(query: MockGustoPaidHoursQuery): Record<string, number> {
