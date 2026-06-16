@@ -87,3 +87,13 @@ export type TimeAllocationSettings = {
   cptStandardMinutes: number;
   smsStandardMinutes: number;
 };
+
+export type DailyEntry = {
+  id: string; // `${nurseId}:${date}`
+  nurseId: string;
+  date: string; // YYYY-MM-DD
+  callsMade: number;
+  callsCompletedCpt: number;
+  smsSent: number;
+  paidHours: number;
+};

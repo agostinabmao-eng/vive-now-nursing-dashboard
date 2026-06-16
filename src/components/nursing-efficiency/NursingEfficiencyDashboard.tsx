@@ -3,11 +3,15 @@
 import Card from "@/components/ui/card/Card";
 import EfficiencySummaryTable from "@/components/nursing-efficiency/EfficiencySummaryTable";
 import NursingEfficiencyFilters from "@/components/nursing-efficiency/NursingEfficiencyFilters";
-import { ENROLLMENT_CONTENT_SHELL, ENROLLMENT_PAGE_BG, ENROLLMENT_PAGE_MIN_HEIGHT } from "@/lib/enrollment/styles";
+import NurseDataEntryCard from "@/components/nursing-efficiency/NurseDataEntryCard";
+import { ENROLLMENT_PAGE_BG, ENROLLMENT_PAGE_MIN_HEIGHT } from "@/lib/enrollment/styles";
 import { useNursingEfficiency } from "@/lib/nursing-efficiency/hooks/useNursingEfficiency";
+import { useDailyEntries } from "@/lib/nursing-efficiency/hooks/useDailyEntries";
 import { cn } from "@/lib/utils/style";
 
 export default function NursingEfficiencyDashboard() {
+  const { entries, saveEntry, getEntry } = useDailyEntries();
+
   const {
     filters,
     rows,
@@ -16,7 +20,7 @@ export default function NursingEfficiencyDashboard() {
     setDateRange,
     setNurseId,
     setPracticeId,
-  } = useNursingEfficiency();
+  } = useNursingEfficiency(entries);
 
   return (
     <div className={cn(ENROLLMENT_PAGE_BG, "min-h-full")}>
@@ -40,6 +44,10 @@ export default function NursingEfficiencyDashboard() {
 
         <div className="shrink-0">
           <EfficiencySummaryTable rows={rows} totals={totals} periodLabel={isWeekPreset ? "Day" : "Week"} />
+        </div>
+
+        <div className="shrink-0">
+          <NurseDataEntryCard onSave={saveEntry} getEntry={getEntry} />
         </div>
       </Card>
     </div>

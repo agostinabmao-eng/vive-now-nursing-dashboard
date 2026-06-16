@@ -11,11 +11,13 @@ import {
   MOCK_NURSES,
 } from "@/lib/nursing-efficiency/dev/nursing-efficiency-mock";
 import type {
+  DailyEntry,
   EfficiencyTotals,
   NurseChartSeries,
   NurseCompareWeekRow,
   NursingEfficiencyFilters,
   NursingEfficiencyViewMode,
+  WeeklyDialPadMetrics,
   WeeklyEfficiencyRow,
   WeekBucket,
 } from "@/lib/nursing-efficiency/types";
@@ -28,6 +30,39 @@ import {
   DEFAULT_TIME_ALLOCATION,
 } from "@/lib/nursing-efficiency/utils";
 import type { DateRangePreset } from "@/types/report";
+
+function realPaidHoursMap(entries: DailyEntry[], weeks: WeekBucket[]): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const week of weeks) {
+    const weekFrom = week.from.toISOString().slice(0, 10);
+    const weekTo = week.to.toISOString().slice(0, 10);
+    for (const entry of entries) {
+      if (entry.date >= weekFrom && entry.date <= weekTo) {
+        const key = actualHoursKey(entry.nurseId, week.key);
+        result[key] = (result[key] ?? 0) + entry.paidHours;
+      }
+    }
+  }
+  return result;
+}
+
+function realMetricsMap(entries: DailyEntry[], weeks: WeekBucket[]): Map<string, WeeklyDialPadMetrics> {
+  const result = new Map<string, WeeklyDialPadMetrics>();
+  for (const week of weeks) {
+    const weekFrom = week.from.toISOString().slice(0, 10);
+    const weekTo = week.to.toISOString().slice(0, 10);
+    const weekEntries = entries.filter((e) => e.date >= weekFrom && e.date <= weekTo);
+    if (weekEntries.length > 0) {
+      result.set(week.key, {
+        weekKey: week.key,
+        callsMade: weekEntries.reduce((s, e) => s + e.callsMade, 0),
+        callsCompletedCpt: weekEntries.reduce((s, e) => s + e.callsCompletedCpt, 0),
+        smsSent: weekEntries.reduce((s, e) => s + e.smsSent, 0),
+      });
+    }
+  }
+  return result;
+}
 
 function createDefaultFilters(): NursingEfficiencyFilters {
   const defaultRange = getPresetRange("this_month") ?? undefined;
@@ -74,7 +109,7 @@ function buildRowsForNurse(
   });
 }
 
-export function useNursingEfficiency() {
+export function useNursingEfficiency(dailyEntries: DailyEntry[] = []) {
   const [filters, setFilters] = useState<NursingEfficiencyFilters>(createDefaultFilters);
   const [viewMode, setViewMode] = useState<NursingEfficiencyViewMode>("summary");
 
@@ -115,8 +150,10 @@ export function useNursingEfficiency() {
 
   const paidHoursByWeek = useMemo(() => {
     if (weeks.length === 0) return {};
-    return getMockGustoPaidHours({ nurseId: filters.nurseId, weeks });
-  }, [filters.nurseId, weeks]);
+    const mock = getMockGustoPaidHours({ nurseId: filters.nurseId, weeks });
+    const real = realPaidHoursMap(dailyEntries, weeks);
+    return { ...mock, ...real };
+  }, [filters.nurseId, weeks, dailyEntries]);
 
   const rows: WeeklyEfficiencyRow[] = useMemo(() => {
     const from = filters.dateRange?.from;
@@ -124,27 +161,25 @@ export function useNursingEfficiency() {
     if (!from || !to) return [];
 
     const weekKeys = weeks.map((week) => week.key);
-    const metrics = getMockDialPadMetrics(
-      {
-        nurseId: filters.nurseId,
-        practiceId: filters.practiceId,
-        from,
-        to,
-      },
+    const mockMetrics = getMockDialPadMetrics(
+      { nurseId: filters.nurseId, practiceId: filters.practiceId, from, to },
       weekKeys
     );
+    const realMetrics = realMetricsMap(dailyEntries, weeks);
 
     return weeks.map((week) => {
-      const weekMetrics = metrics.find((item) => item.weekKey === week.key) ?? {
-        weekKey: week.key,
-        callsMade: 0,
-        callsCompletedCpt: 0,
-        smsSent: 0,
-      };
+      const weekMetrics =
+        realMetrics.get(week.key) ??
+        mockMetrics.find((item) => item.weekKey === week.key) ?? {
+          weekKey: week.key,
+          callsMade: 0,
+          callsCompletedCpt: 0,
+          smsSent: 0,
+        };
       const paidHours = sumPaidHoursForWeek(week.key, filters.nurseId, paidHoursByWeek);
       return buildEfficiencyRow(week, weekMetrics, paidHours, DEFAULT_TIME_ALLOCATION);
     });
-  }, [filters, weeks, paidHoursByWeek]);
+  }, [filters, weeks, paidHoursByWeek, dailyEntries]);
 
   const totals: EfficiencyTotals = useMemo(() => buildEfficiencyTotals(rows), [rows]);
 
